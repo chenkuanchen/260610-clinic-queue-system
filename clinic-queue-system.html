@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>clinic queue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Quicksand:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --sky-50: #f0f9ff;
+            --sky-100: #e0f2fe;
+            --sky-200: #bae6fd;
+            --sky-300: #7dd3fc;
+            --sky-400: #38bdf8;
+            --sky-500: #0ea5e9;
+            --sky-600: #0284c7;
+            --sky-700: #0369a1;
+            --ink: #0f3a52;
+            --ink-soft: #5b7a8a;
+            --mint: #5ec9b5;
+            --card-bg: rgba(255, 255, 255, 0.78);
+            --shadow: 0 10px 30px -12px rgba(2, 132, 199, 0.28);
+            --shadow-sm: 0 4px 16px -8px rgba(2, 132, 199, 0.30);
+            --radius: 24px;
+            --radius-sm: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+            background:
+                radial-gradient(1100px 600px at 12% -10%, var(--sky-200) 0%, transparent 55%),
+                radial-gradient(900px 500px at 100% 0%, #d6f3ff 0%, transparent 50%),
+                linear-gradient(180deg, var(--sky-50) 0%, #f7fcff 100%);
+            padding: 28px clamp(16px, 4vw, 48px) 60px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--sky-400), var(--sky-600));
+            box-shadow: var(--shadow-sm);
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            color: var(--ink-soft);
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .clock {
+            margin-left: auto;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--sky-700);
+            background: var(--card-bg);
+            padding: 10px 18px;
+            border-radius: 999px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 22px;
+            align-items: start;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 860px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--sky-700);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .card-title .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--sky-400);
+        }
+
+        /* 掛號表單 */
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink-soft);
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            font-family: inherit;
+            font-size: 16px;
+            color: var(--ink);
+            padding: 14px 16px;
+            border: 2px solid var(--sky-100);
+            border-radius: var(--radius-sm);
+            background: #fff;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--sky-300);
+            box-shadow: 0 0 0 4px rgba(125, 211, 252, 0.25);
+        }
+
+        .btn {
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 15px;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: transform .12s ease, box-shadow .2s, background .2s, opacity .2s;
+            width: 100%;
+        }
+
+        .btn:active {
+            transform: translateY(1px) scale(0.99);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--sky-400), var(--sky-600));
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+            margin-top: 16px;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 22px -8px rgba(2, 132, 199, 0.5);
+        }
+
+        .stat-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .stat {
+            flex: 1;
+            background: var(--sky-50);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat .num {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 26px;
+            color: var(--sky-600);
+            line-height: 1;
+        }
+
+        .stat .lbl {
+            font-size: 12px;
+            color: var(--ink-soft);
+            margin-top: 6px;
+        }
+
+        /* 目前看診 */
+        .now-card {
+            background: linear-gradient(135deg, var(--sky-500), var(--sky-700));
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: 0 18px 40px -16px rgba(3, 105, 161, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .now-card::after {
+            content: "";
+            position: absolute;
+            right: -60px;
+            top: -60px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .now-card .label {
+            font-size: 14px;
+            letter-spacing: 3px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .now-card .number {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: clamp(72px, 14vw, 120px);
+            line-height: 1;
+            margin: 8px 0;
+            text-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+        }
+
+        .now-card .name {
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .now-card .empty {
+            font-size: 22px;
+            font-weight: 500;
+            opacity: 0.85;
+            padding: 12px 0;
+        }
+
+        .actions {
+            display: flex;
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .btn-call {
+            background: linear-gradient(135deg, var(--sky-400), var(--sky-600));
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-done {
+            background: linear-gradient(135deg, #6ee7c7, var(--mint));
+            color: #0a4b3e;
+            box-shadow: 0 4px 16px -8px rgba(94, 201, 181, 0.6);
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .lists {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-top: 22px;
+        }
+
+        @media (max-width: 560px) {
+            .lists {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ul.queue {
+            list-style: none;
+        }
+
+        .queue li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px -6px rgba(2, 132, 199, 0.25);
+            transition: transform .15s;
+        }
+
+        .queue li:hover {
+            transform: translateX(3px);
+        }
+
+        .queue .badge {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--sky-600);
+            background: var(--sky-100);
+            border-radius: 12px;
+            min-width: 46px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .queue .info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .queue .info .nm {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .queue .info .tm {
+            font-size: 12px;
+            color: var(--ink-soft);
+        }
+
+        .queue .tag {
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--sky-500);
+            padding: 4px 10px;
+            border-radius: 999px;
+            flex-shrink: 0;
+        }
+
+        .queue li.next {
+            border: 2px solid var(--sky-300);
+            background: var(--sky-50);
+        }
+
+        .queue li.done .badge {
+            background: #e7f6f1;
+            color: var(--mint);
+        }
+
+        .queue li.done .info .nm {
+            color: var(--ink-soft);
+        }
+
+        .empty-hint {
+            text-align: center;
+            color: var(--ink-soft);
+            font-size: 13px;
+            padding: 24px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">＋</div>
+        <div>
+            <h1>晴空診所 · 叫號系統</h1>
+            <p>Clinic Queue System</p>
+        </div>
+        <div class="clock" id="clock">--:--:--</div>
+    </div>
+
+    <div class="grid">
+        <!-- 左：掛號 -->
+        <div class="card">
+            <div class="card-title"><span class="dot"></span>掛號報到</div>
+            <label for="nameInput">病患姓名</label>
+            <input type="text" id="nameInput" placeholder="請輸入姓名" autocomplete="off">
+            <button class="btn btn-primary" id="registerBtn">取號掛號</button>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="num" id="statWaiting">0</div>
+                    <div class="lbl">等待中</div>
+                </div>
+                <div class="stat">
+                    <div class="num" id="statDone">0</div>
+                    <div class="lbl">已完成</div>
+                </div>
+                <div class="stat">
+                    <div class="num" id="statNext">1</div>
+                    <div class="lbl">待發號碼</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右：顯示與流程 -->
+        <div>
+            <div class="now-card">
+                <div class="label">目前看診</div>
+                <div id="nowContent">
+                    <!-- <div class="empty">目前無看診中病患</div> -->
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-call" id="callBtn">叫下一位</button>
+                <button class="btn btn-done" id="doneBtn">看診完成</button>
+            </div>
+
+            <div class="lists">
+                <div class="card">
+                    <div class="card-title"><span class="dot"></span>等待清單</div>
+                    <ul class="queue" id="waitingList"></ul>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="dot"></span>已完成</div>
+                    <ul class="queue" id="completedList"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---- 1. 狀態 (TODO) ----
+        // 請宣告下列 4 個狀態變數（使用 let）：
+        //   nextNumber : 下一個要分配的號碼，初始值 1
+        //   waiting    : 等待清單陣列，元素格式 { number, name, time }，初始 []
+        //   current    : 目前看診者物件或 null，初始 null
+        //   completed  : 已完成清單陣列，初始 []
+        // TODO: 在此宣告
+
+        let nextNumber = 1;
+        let waiting = [];
+        let current = null;
+        let completed = [];
+
+
+
+
+        // ---- DOM 參考 (已提供) ----
+        const nameInput = document.getElementById('nameInput');
+        const registerBtn = document.getElementById('registerBtn');
+        const callBtn = document.getElementById('callBtn');
+        const doneBtn = document.getElementById('doneBtn');
+        const nowContent = document.getElementById('nowContent');
+        const waitingList = document.getElementById('waitingList');
+        const completedList = document.getElementById('completedList');
+
+        // ---- 工具函式 (已提供) ----
+        const pad = n => String(n).padStart(3, '0');          // 1 -> "001"
+        const nowTime = () => {                                // 取得 HH:MM:SS
+            const d = new Date();
+            const t = x => String(x).padStart(2, '0');
+            return `${t(d.getHours())}:${t(d.getMinutes())}:${t(d.getSeconds())}`;
+        };
+        // 將姓名中的特殊字元轉義，避免 innerHTML 造成 XSS。輸出字串時請用 escapeHtml(名字)
+        function escapeHtml(s) {
+            return s.replace(/[&<>"']/g, c =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+
+        // ---- 2. 掛號 register() (TODO) ----
+        function register() {
+            //     // 1) 取得輸入框的值並去除前後空白
+            //     // 2) 若為空字串 → 直接 return（不要掛號）
+            const name = nameInput.value.trim();
+            if (name === '') return;
+            waiting.push({ number: nextNumber, name, time: nowTime() });
+            // console.log(waiting)
+            // 3) 將 { number: nextNumber, name, time: nowTime() } 推入 waiting
+            // 4) nextNumber 加 1
+            nextNumber++;
+            // 5) 清空輸入框（nameInput.value = ''）、可呼叫 nameInput.focus()
+            nameInput.value = ''
+            // 6) 呼叫 render() 更新畫面
+            render();
+        }
+
+
+        // ---- 3. 叫下一位 callNext() (TODO) ----
+        // function callNext() {
+        // 1) 若「目前已有人看診」(current 不為 null) 或「等待清單為空」→ return
+        // 2) 用 waiting.shift() 取出第一位，指派給 current
+        // 3) 呼叫 render()
+        // }
+        function callNext() {
+            if (current !== null || waiting.length === 0) return;
+            current = waiting.shift();
+            render();
+        }
+
+
+
+        // ---- 4. 看診完成 complete() (TODO) ----
+        // function complete() {
+        // 1) 若沒有人看診 (current 為 null) → return
+        // 2) 把 current 加上完成時間後放到 completed 「最前面」
+        //    提示：completed.unshift({ ...current, doneTime: nowTime() })
+        // 3) current 設回 null
+        // 4) 呼叫 render()
+        // }
+        function complete() {
+            if (current === null) return;
+            completed.unshift({ ...current, doneTime: nowTime() })
+            current = null;
+            render();
+        }
+
+
+        // ---- 5. render()：依狀態重畫整個畫面 (TODO) ----
+        function render() {
+
+            // (5a) 目前看診卡 nowContent.innerHTML
+            //   有人看診時填入：
+            //     `<div class="number">${pad(current.number)}</div>
+            //      <div class="name">${escapeHtml(current.name)}</div>`
+            //   沒有人時填入：
+            //     `<div class="empty">目前無看診中病患</div>`
+            if (current === null) {
+                nowContent.innerHTML = `<div class="empty">目前無看診中病患</div>`;
+            } else {
+                nowContent.innerHTML = `
+                <div class="number">${pad(current.number)}</div>
+                <div class="name">${escapeHtml(current.name)}</div>`;
+            }
+
+            // (5b) 等待清單 waitingList.innerHTML
+            //   waiting 為空 → `<div class="empty-hint">尚無等待病患</div>`
+            //   否則用 waiting.map((p, i) => ...).join('') 產生每筆 <li>：
+            //     - 第一位 (i === 0) 的 <li> 要加 class="next"，並在尾端加上
+            //       <span class="tag">下一位</span>
+            //     - 單筆結構參考：
+            //       <li class="（第一位填 next）">
+            //         <span class="badge">${pad(p.number)}</span>
+            //         <div class="info">
+            //           <div class="nm">${escapeHtml(p.name)}</div>
+            //           <div class="tm">掛號 ${p.time}</div>
+            //         </div>
+            //         （第一位才放）<span class="tag">下一位</span>
+            //       </li>
+            if (waiting.length === 0) {
+                waitingList.innerHTML = `<div class="empty-hint">尚無等待病患</div>`
+            } else {
+                waitingList.innerHTML = waiting.map((p, i) => `
+                    <li class="${i === 0 ? 'next' : ''}">
+                        <span class="badge">${pad(p.number)}</span>
+                        <div class="info">
+                            <div class="nm">${escapeHtml(p.name)}</div>
+                            <div class="tm">掛號 ${p.time}</div>
+                        </div>
+                        ${i === 0 ? '<span class="tag">下一位</span>' : ''}
+                    </li>
+                `).join('');
+            }
+
+            // (5c) 已完成清單 completedList.innerHTML
+            //   completed 為空 → `<div class="empty-hint">尚無完成紀錄</div>`
+            //   否則每筆 <li class="done">，內容同上，時間顯示為「完成 ${p.doneTime}」
+            if (completed.length === 0) {
+                completedList.innerHTML = `<div class="empty-hint">尚無完成紀錄</div>`
+            } else {
+                completedList.innerHTML = completed.map((p) => `
+                    <li class="done">
+                            <span class="badge">${pad(p.number)}</span>
+                            <div class="info">
+                                <div class="nm">${escapeHtml(p.name)}</div>
+                                <div class="tm">完成 ${p.doneTime}</div>
+                            </div>
+                        </li>
+                    `).join('');
+            }
+
+            // (5d) 統計數字
+            document.getElementById('statWaiting').textContent = waiting.length
+            document.getElementById('statDone').textContent = completed.length
+            document.getElementById('statNext').textContent = pad(nextNumber)
+
+
+            // (5e) 按鈕禁用狀態
+            //   callBtn.disabled = （有人看診中）或（等待清單為空）
+            //   doneBtn.disabled = （沒有人看診中）
+            callBtn.disabled = (current !== null || waiting.length === 0)
+            doneBtn.disabled = (current === null)
+        }
+
+
+        // ---- 6. 事件綁定 (TODO) ----
+        // registerBtn 點擊        → register
+        // nameInput 按下 Enter    → register（在 keydown 事件中判斷 e.key === 'Enter'）
+        // callBtn 點擊            → callNext
+        // doneBtn 點擊            → complete
+        registerBtn.addEventListener(('click'), function () {
+            register()
+        })
+
+        callBtn.addEventListener(('click'), function () {
+            callNext();
+        })
+
+        doneBtn.addEventListener(('click'), function () {
+            complete();
+        })
+
+
+
+        // ---- 時鐘 (已提供) ----
+        const clockEl = document.getElementById('clock');
+        setInterval(() => clockEl.textContent = nowTime(), 1000);
+        clockEl.textContent = nowTime();
+
+
+        // ---- 初始渲染 (TODO) ----
+        // 完成上面後，於此呼叫一次 render()，讓畫面顯示初始的空狀態
+        render();
+    </script>
+</body>
+
+</html>
